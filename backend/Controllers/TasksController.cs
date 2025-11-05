@@ -74,8 +74,8 @@ namespace TaskManager.API
                 return BadRequest(ModelState);
 
             var task = await _context.Tasks.FindAsync(id);
-            if (task == null)
-                return NotFound();
+            if (task == null) 
+                return NotFound(new { Message = $"Task with ID {id} not found" });      //validation message return for informative returns
 
             task.Title = request.Title;
             task.IsDone = request.IsDone;
