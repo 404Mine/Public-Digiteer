@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using TaskManager.Models;
 using TaskManager.Data;
+using task_manager_api;
 namespace TaskManager.API
 {
     [Route("tasks")]
@@ -18,11 +19,18 @@ namespace TaskManager.API
             _context = context;
         }
 
+        // GET /tasks request
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            
-            var tasks = await _context.Tasks.ToListAsync();
+            var tasks = await _context.Tasks
+                .Select(t => new TaskItemViewModel
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    IsDone = t.IsDone
+                }).ToListAsync();
+
             return Ok(tasks);
         }
 
