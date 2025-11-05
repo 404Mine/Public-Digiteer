@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using TaskManager.Models;
 using TaskManager.Data;
 using task_manager_api;
+
+using task_manager_api;
+using Microsoft.AspNetCore.Server.Kestrel.Core.Features;
+
 namespace TaskManager.API
 {
     [Route("tasks")]
@@ -34,33 +38,65 @@ namespace TaskManager.API
             return Ok(tasks);
         }
 
+        // POST /tasks
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TaskItem task)
+        public async Task<IActionResult> Create([FromBody] TaskItemRequests request)
         {
-            
-            _context.Tasks.Add(task);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var tasks = new TaskItem
+            {
+                Title = request.Title,
+                IsDone = request.IsDone,
+                UserId = 1                  //acutally is bad due to hardcode but there's no authentication functionality yet so... for temp use only
+            };
+
+            _context.Tasks.Add(tasks);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new { id = task.Id }, task);
+
+            var viewModel = new TaskItemViewModel
+            {
+                Id = tasks.Id,
+                Title = tasks.Title,
+                IsDone = tasks.IsDone
+            };
+
+            return CreatedAtAction(nameof(Get), new { id = tasks.Id }, viewModel);
         }
 
-        [HttpPut("{id}")] 
-        public async Task<IActionResult> Update(int id, [FromBody] TaskItem updated)
+        // PUT /tasks
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] TaskItemRequests request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var task = await _context.Tasks.FindAsync(id);
-            if (task == null) return NotFound();
+            if (task == null)
+                return NotFound();
 
-            task.Title = updated.Title;
-            task.IsDone = updated.IsDone;
+            task.Title = request.Title;
+            task.IsDone = request.IsDone;
+
             await _context.SaveChangesAsync();
 
-            return Ok(task);
+            return Ok(new TaskItemViewModel
+            {
+                Id = task.Id,
+                Title = task.Title,
+                IsDone = task.IsDone
+            });
         }
 
+        // DELETE /tasks
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var task = await _context.Tasks.FindAsync(id);
-            if (task == null) return NotFound();
+            if (task == null)
+                return NotFound();
 
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
