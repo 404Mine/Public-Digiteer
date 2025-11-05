@@ -1,49 +1,62 @@
-# .NET Task Evaluator API – Technical Exam
+DEV NOTES
 
-⏰ **Estimated Time**: 2–3 hours  
-🔧 **Tech Stack**:
-- .NET 9 Web API  
-- PostgreSQL  
-- Entity Framework Core (EF Core)  
-- Swagger for API documentation  
+dotnet-task-evaluator
+backend
 
----
+download all preqrequisites
+identify the connection of project to postgresql base on readme.md
+Add defaultconnection string and then migrate with readme.md command line
 
-## 🧪 Technical Exam Instructions
+✦ Run The Project
+	✓ no initial errors
+	✓ displays now listening at a specific http url
 
-### 1. Clone the repository
+✦ Visit the url API Swagger
+	! GET /tasks endpoint returns ok status but no object data
+	! Returns EF Core entities, potential internal data leak, circular reference exceptions
 
-```bash
-git clone https://github.com/phia-digiteer/dotnet-task-evaluator.git
-cd dotnet-task-evaluator
-```
+✦ Checked Models in relation to tasks
+	✓ Has table structure
+	✓ Has 1:M relationship
 
----
+✦ Checked Users Model
+	! Had bad indentions which hurts dev eyes (if it builds up)
+	! PasswordHash is direct to API Response -> EFCore Returns
+	✓ Added ViewModel for User Access
+	✓ Added RegisterRequestClass for Input with Validation Attributes
 
-2. Set up the environment
-Make sure you have the .NET 9 SDK and PostgreSQL installed. Configure your local database connection string as needed.
-3. Apply database migrations
-Run the following command to create the database schema:
+✦ Go back to task model and controller
+	✓ Async and Await methods are properly used
+	✓ Contains Basic Crud already
+	✓ Returns proper http codes
+	✓ Uses DBContext
+	! Returns EF Core Entities
+	! Client Access Directly the EF
 
-```bash
-dotnet ef database update
-```
+✦ TaskController Modifications
+	✓ CRUD Functionality uses ViewModels
+	✓ Validations Message Additions
+	! User Auth/Login is nonexisting
+_______________________________________________________________________________________________________________________
 
-### 🎯 Objectives
+Version Control
+Git Commits
 
-- Interact with a .NET 9 Web API in a realistic development environment  
-- Notice gaps or inconsistencies within basic operations  
-- Consider improvements around structure, access control, and maintainability  
-- Apply practical architectural concepts to guide decisions  
-- Enhance functionality where needed or where something feels off  
-- Work with EF Core to interact with data cleanly  
-- Optionally introduce supporting tests or clarifying documentation
 
-### 📦 Commit Guidelines
+✦ eb5a733
+	✓ appsettings.json
+	✓ backend.sln
 
-Please commit frequently as you work. Avoid one big fat commit at the end.
-Each commit should:
+✦ 9f7509c
+	✓ ViewModels/
+	✓ TaskItemViewModel.cs
+	✓ UserViewModel.cs
 
-- Have a clear, descriptive message (e.g., Add TaskService)-Explain your reasoning if you're making assumptions or design choices
-- Show incremental progress (yes, even small ones!)
-- Your commit history helps us understand your thinking — don’t hide the struggle 💪
+✦ 7acd956
+	✓ TaskController.cs GET /tasks
+
+✦ 3bac4f5
+	✓ TaskController.cs POST, PUT, DELETE /tasks
+
+✦ c1d257f
+	✓ Added Return Validation Message
